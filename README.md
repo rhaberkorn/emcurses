@@ -17,4 +17,14 @@ It's already functional, though.
 ## Installation
 
     cd emscripten/
-    emmake
+    emmake make
+
+This will produce a `libpdcurses.so`. When linking it with
+a Curses application, you should preload `termlib.js`.
+For example, the PDCurses `rain.c` example is compiled/linked
+as follows:
+
+    emcc -I.. -o rain.js rain.c --pre-js termlib.js libpdcurses.so
+
+See e.g. `rain.html` for an example of embedding an EMCurses
+application into a Webpage.
