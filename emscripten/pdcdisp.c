@@ -52,8 +52,9 @@ void PDC_gotoyx(int row, int col)
     PDC_LOG(("PDC_gotoyx() - called: row %d col %d from row %d col %d\n",
              row, col, SP->cursrow, SP->curscol));
 
-    asm("term.cursorSet(%0, %1);"
-       ::"r"(row), "r"(col));
+    EM_ASM_INT({
+        term.cursorSet($0, $1);
+    }, row, col);
 }
 
 /* update the given physical line to look like the corresponding line in
@@ -91,7 +92,8 @@ void PDC_transform_line(int lineno, int x, int len, const chtype *srcp)
            }
        }
 
-       asm("term.setChar(%0, %1, %2, %3);"
-          ::"r"(ch & 0xFF), "r"(lineno), "r"(x+j), "r"(style));
+       EM_ASM_INT({
+           term.setChar($0, $1, $2, $3);
+       }, ch & 0xFF, lineno, x+j, style);
     }
 }

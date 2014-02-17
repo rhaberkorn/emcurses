@@ -42,9 +42,9 @@ int PDC_curs_set(int visibility)
     SP->visibility = visibility;
 
     if (visibility)
-        asm("term.cursorOn();");
+        EM_ASM(term.cursorOn());
     else
-        asm("term.cursorOff();");
+        EM_ASM(term.cursorOff());
 
     return ret_vis;
 }

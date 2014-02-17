@@ -38,26 +38,25 @@ void PDC_set_keyboard_binary(bool on)
 
 bool PDC_check_key(void)
 {
-    int c;
-
     if ((PDC_get_columns() != SP->cols ||
          PDC_get_rows() != SP->lines) && !SP->resized)
 	return TRUE;
 
-    asm("term.inputChar;" :"=r"(c));
-
-    return c ? TRUE : FALSE;
+    return EM_ASM_INT_V({
+        return term.inputChar;
+    }) ? TRUE : FALSE;
 }
 
 /* return the next available key or mouse event */
 
 int PDC_get_key(void)
 {
-    int c;
+    int c = EM_ASM_INT_V({
+        return term.inputChar;
+    });
     int key = 0;
 
-    asm("term.inputChar;" :"=r"(c));
-    asm("term.inputChar = 0;");
+    EM_ASM(term.inputChar = 0);
 
     switch (c) {
     case 0x7F: /* DEL */
@@ -99,7 +98,7 @@ void PDC_flushinp(void)
 {
     PDC_LOG(("PDC_flushinp() - called\n"));
 
-    asm("term.inputChar = 0;");
+    EM_ASM(term.inputChar = 0);
 }
 
 int PDC_mouse_set(void)

@@ -12,7 +12,7 @@ static struct {short f, b;} atrtab[PDC_COLOR_PAIRS];
 void PDC_scr_close(void)
 {
     PDC_LOG(("PDC_scr_close() - called\n"));
-    asm("term.close();");
+    EM_ASM(term.close());
 }
 
 void PDC_scr_free(void)
@@ -56,8 +56,9 @@ int PDC_scr_open(int argc, char **argv)
     const char *PDC_LINES = getenv("PDC_LINES"),
 	       *PDC_COLS = getenv("PDC_COLS");
     if (PDC_COLS && PDC_LINES) {
-        asm("term.resizeTo(%0, %1);"
-           ::"r"(atoi(PDC_COLS)), "r"(atoi(PDC_LINES)));
+        EM_ASM_INT({
+            term.resizeTo($0, $1);
+        }, atoi(PDC_COLS), atoi(PDC_LINES));
     }
 
     SP->lines = PDC_get_rows();
@@ -75,8 +76,9 @@ int PDC_scr_open(int argc, char **argv)
 
 int PDC_resize_screen(int nlines, int ncols)
 {
-    asm("term.resizeTo(%0, %1);"
-       ::"r"(ncols), "r"(nlines));
+    EM_ASM_INT({
+        term.resizeTo($0, $1);
+    }, ncols, nlines);
 
     SP->resized = FALSE;
     SP->cursrow = SP->curscol = 0;
