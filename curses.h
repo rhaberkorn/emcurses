@@ -1331,6 +1331,11 @@ int     sb_get_vert(int *, int *, int *);
 int     sb_refresh(void);
 #endif
 
+/* EMCurses-specific functions */
+#ifdef EMSCRIPTEN
+void PDC_emscripten_set_handler(void (*func)(void), int simulateInfiniteLoop);
+#endif
+
 /*** Functions defined as macros ***/
 
 /* getch() and ungetch() conflict with some DOS libraries */

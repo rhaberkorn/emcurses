@@ -32,10 +32,6 @@ int PDC_scr_open(int argc, char **argv)
     if (!SP)
         return ERR;
 
-    /* FIXME: allow registering a C callback that gets called asynchronously
-       from the handler.
-       Also for screen resize events, etc.
-     */
     EM_ASM(
         term = new Terminal({
             termDiv: 'termDiv',
@@ -70,6 +66,34 @@ int PDC_scr_open(int argc, char **argv)
     PDC_reset_prog_mode();
 
     return OK;
+}
+
+/*
+ * Public EMCurses-specific function to set a C-callback
+ * to be called when a key has been pressed.
+ */
+void PDC_emscripten_set_handler(void (*func)(void), int simulateInfiniteLoop)
+{
+    EM_ASM_INT({
+        term.handler = function() {
+            Runtime.dynCall('v', $0);
+        };
+
+        /*
+         * patch term.resizeTo(): also call func,
+         * so the handler has a chance to notice terminal resizings
+         */
+        term.orig_resizeTo = term.orig_resizeTo || term.resizeTo;
+        term.resizeTo = function(x,y) {
+            var r = this.orig_resizeTo(x,y);
+            if (r)
+                Runtime.dynCall('v', $0);
+            return r;
+        };
+    }, (int)func);
+
+    if (simulateInfiniteLoop)
+        EM_ASM(throw 'SimulateInfiniteLoop');
 }
 
 /* the core of resize_term() */
