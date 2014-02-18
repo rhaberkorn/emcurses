@@ -28,6 +28,7 @@ LDFLAGS	= --pre-js termlib.js $(LIBCURSES)
 LIBCURSES	= libpdcurses.so
 
 DEMOS		= firework.js rain.js
+DEMOFLAGS	= -O2
 
 .PHONY: all libs clean demos
 
