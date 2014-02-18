@@ -52,11 +52,11 @@ bool PDC_check_key(void)
 int PDC_get_key(void)
 {
     int c = EM_ASM_INT_V({
-        return term.inputChar;
+        var c = term.inputChar;
+        term.inputChar = 0;
+        return c;
     });
     int key = 0;
-
-    EM_ASM(term.inputChar = 0);
 
     switch (c) {
     case 0x7F: /* DEL */
