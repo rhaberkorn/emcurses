@@ -1,3 +1,5 @@
 *.o
 *.js
 *.so
+emscripten/*.html
+emscripten/*.html.mem
