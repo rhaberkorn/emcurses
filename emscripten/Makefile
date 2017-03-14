@@ -27,8 +27,11 @@ LINK		= $(CC)
 LDFLAGS	= --pre-js termlib.js $(LIBCURSES)
 LIBCURSES	= libpdcurses.so
 
-DEMOS		= firework.html rain.html
-DEMOFLAGS	= $(CFLAGS) --shell-file template.html
+# testcurs.html fails to build and tuidemo.html fails to run
+DEMOS		= firework.html newdemo.html ptest.html rain.html \
+			  worm.html xmas.html
+DEMOFLAGS	= $(CFLAGS) --shell-file template.html \
+			  -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 
 .PHONY: all libs clean demos
 
@@ -59,8 +62,32 @@ $(PDCOBJS) : %.o: $(osdir)/%.c
 	$(BUILD) $(SFLAGS) -c $<
 
 firework.html: firework.c
-	$(CC) -I.. $(DEMOFLAGS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 \
+	$(CC) -I.. $(DEMOFLAGS) \
 	      -o $@ $< $(LDFLAGS)
 
+newdemo.html: $(demodir)/newdemo.c
+	$(BUILD) $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+
+ptest.html: $(demodir)/ptest.c
+	$(BUILD) $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+
 rain.html: rain.c
-	$(CC) -I.. $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+	$(CC) -I.. $(CFLAGS) --shell-file template.html -o $@ $< $(LDFLAGS)
+
+testcurs.html: $(demodir)/testcurs.c
+	$(BUILD) $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+
+tuidemo.html: tuidemo.o tui.o
+	$(LINK) tui.o tuidemo.o -o $@ $(LDFLAGS)
+
+worm.html: $(demodir)/worm.c
+	$(BUILD) $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+
+xmas.html: $(demodir)/xmas.c
+	$(BUILD) $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+
+tui.o: $(demodir)/tui.c $(demodir)/tui.h
+	$(BUILD) -c $(DEMOFLAGS) $(demodir)/tui.c
+
+tuidemo.o: $(demodir)/tuidemo.c
+	$(BUILD) -c $(DEMOFLAGS) $(demodir)/tuidemo.c
