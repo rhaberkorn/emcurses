@@ -27,8 +27,8 @@ LINK		= $(CC)
 LDFLAGS	= --pre-js termlib.js $(LIBCURSES)
 LIBCURSES	= libpdcurses.so
 
-DEMOS		= firework.js rain.js
-DEMOFLAGS	= -O2
+DEMOS		= firework.html rain.html
+DEMOFLAGS	= $(CFLAGS) --shell-file template.html
 
 .PHONY: all libs clean demos
 
@@ -37,7 +37,8 @@ all:	libs demos
 libs:	$(LIBCURSES)
 
 clean:
-	-rm -rf *.o trace $(LIBCURSES) $(DEMOS)
+	-rm -rf *.o trace $(LIBCURSES) $(DEMOS) $(DEMOS:.html=.js) \
+	        $(DEMOS:.html=.html.mem)
 
 demos:	$(DEMOS)
 
@@ -57,8 +58,9 @@ $(LIBOBJS) : %.o: $(srcdir)/%.c
 $(PDCOBJS) : %.o: $(osdir)/%.c
 	$(BUILD) $(SFLAGS) -c $<
 
-firework.js: firework.c
-	$(CC) -I.. $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
+firework.html: firework.c
+	$(CC) -I.. $(DEMOFLAGS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 \
+	      -o $@ $< $(LDFLAGS)
 
-rain.js: rain.c
+rain.html: rain.c
 	$(CC) -I.. $(DEMOFLAGS) -o $@ $< $(LDFLAGS)
